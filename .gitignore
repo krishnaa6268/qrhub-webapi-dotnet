@@ -1,0 +1,27 @@
+# .NET build files
+**/bin/
+**/obj/
+**/TestResults/
+**/publish/
+
+# IDE and OS files
+.vs/
+.idea/
+.DS_Store
+*.user
+*.suo
+
+# Local secrets and environment variables
+.env
+.env.*
+!.env.example
+**/secrets.json
+**/appsettings.*.local.json
+
+# Logs
+*.log
+logs/
+
+# Local certificates
+*.pfx
+*.p12
