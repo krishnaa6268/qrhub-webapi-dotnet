@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: qrhub-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: qrhub_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d qrhub_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: qrhub-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=qrhub_db;Username=postgres;Password=postgres;
+      - JwtSettings__Secret=super_secret_qrhub_jwt_signing_key_production_2026_dotnet_at_least_32_chars!
+      - JwtSettings__Issuer=QRHubApi
+      - JwtSettings__Audience=QRHubClient
+      - JwtSettings__ExpiryMinutes=1440
+    ports:
+      - "5143:8080"
+    profiles:
+      - all
+
+volumes:
+  postgres_data:
+    driver: local

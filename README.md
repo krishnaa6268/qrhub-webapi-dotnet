@@ -135,7 +135,20 @@ QRHub/
 - [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (must be running)
 
-### 2. Start PostgreSQL via Docker
+### 2. Environment Configuration
+
+The application uses `.env` files for seamless configuration across Docker and local execution:
+
+- **`.env`**: Contains your active local development settings (loaded automatically by `docker compose` and `dotnet run`).
+- **`.env.local`**: Contains dummy / placeholder data for local overrides or testing without production values.
+- **`.env.example`**: Version-controlled template for team onboarding.
+
+```bash
+# To initialize from template:
+cp .env.example .env
+```
+
+### 3. Start PostgreSQL via Docker
 
 Run the following command in the root project directory:
 
@@ -151,7 +164,7 @@ docker ps --filter "name=qrhub-postgres"
 
 > **Note**: PostgreSQL is mapped to port `5432` with username `postgres`, password `postgres`, and database `qrhub_db`.
 
-### 3. Run the Application
+### 4. Run the Application
 
 Start the Web API:
 
@@ -160,9 +173,10 @@ dotnet run --project QRHub.Api
 ```
 
 The application will automatically:
-1. Connect to PostgreSQL in Docker.
-2. Apply all pending EF Core migrations (creating tables and indexes).
-3. Start listening on **`http://localhost:5143`**.
+1. Load environment variables from `.env` and `.env.local`.
+2. Connect to PostgreSQL in Docker.
+3. Apply all pending EF Core migrations (creating tables and indexes).
+4. Start listening on **`http://localhost:5143`**.
 
 ---
 

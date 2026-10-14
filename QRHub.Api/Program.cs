@@ -4,6 +4,9 @@ using QRHub.Application;
 using QRHub.Infrastructure;
 using Scalar.AspNetCore;
 
+// Load .env and .env.local files before configuration initialization
+EnvLoader.Load();
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add Clean Architecture Layers

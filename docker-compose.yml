@@ -1,18 +1,18 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: qrhub-postgres
+    container_name: ${POSTGRES_CONTAINER_NAME:-qrhub-postgres}
     restart: unless-stopped
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: qrhub_db
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-qrhub_db}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d qrhub_db"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-qrhub_db}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -21,20 +21,20 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: qrhub-api
+    container_name: ${API_CONTAINER_NAME:-qrhub-api}
     restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=qrhub_db;Username=postgres;Password=postgres;
-      - JwtSettings__Secret=super_secret_qrhub_jwt_signing_key_production_2026_dotnet_at_least_32_chars!
-      - JwtSettings__Issuer=QRHubApi
-      - JwtSettings__Audience=QRHubClient
-      - JwtSettings__ExpiryMinutes=1440
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB:-qrhub_db};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres};
+      - JwtSettings__Secret=${JWT_SECRET:-super_secret_qrhub_jwt_signing_key_production_2026_dotnet_at_least_32_chars!}
+      - JwtSettings__Issuer=${JWT_ISSUER:-QRHubApi}
+      - JwtSettings__Audience=${JWT_AUDIENCE:-QRHubClient}
+      - JwtSettings__ExpiryMinutes=${JWT_EXPIRY_MINUTES:-1440}
     ports:
-      - "5143:8080"
+      - "${API_PORT:-5143}:8080"
     profiles:
       - all
 
